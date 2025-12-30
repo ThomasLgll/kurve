@@ -136,40 +136,39 @@ Kurve.Menu = {
 
         if (event.keyCode === 32) {
             Kurve.Menu.onSpaceDown();
-        }
+        } else {
+            let unableKeys = []
+            const selectedKeyToModify = this.selectedKeyToModify;
+            Kurve.players.forEach(function(player) {
+                let exceptKey = null
+                if (
+                    selectedKeyToModify
+                    && selectedKeyToModify.playerId === player.id
+                ) {
+                    exceptKey = selectedKeyToModify.key
+                }
+                unableKeys = [...unableKeys, ...player.getUnableKeys(exceptKey)]
+            })
+            const uniqueUnableKeys = new Set(unableKeys);
 
+            console.log(event.keyCode, uniqueUnableKeys);
+            console.log(this.selectedKeyToModify);
+            if (selectedKeyToModify) {
+                if(!uniqueUnableKeys.has(event.keyCode)) {
+                    const player = Kurve.getPlayer(selectedKeyToModify.playerId)
+                    player.setKey(selectedKeyToModify.key, event.keyCode)
+                    this.selectNextKeyToModify();
+                    let modifiedDiv = document.getElementById(selectedKeyToModify.playerId + "-key-" + selectedKeyToModify.key)
+                    modifiedDiv.innerHTML = "<div>" + player.getKeyChar(selectedKeyToModify.key) + "</div>";
+                } else {
+                    Kurve.Menu.audioPlayer.play('menu-error', {reset: true});
 
-        let unableKeys = []
-        const selectedKeyToModify = this.selectedKeyToModify;
-        Kurve.players.forEach(function(player) {
-            let exceptKey = null
-            if (
-                selectedKeyToModify
-                && selectedKeyToModify.playerId === player.id
-            ) {
-                exceptKey = selectedKeyToModify.key
-            }
-            unableKeys = [...unableKeys, ...player.getUnableKeys(exceptKey)]
-        })
-        const uniqueUnableKeys = new Set(unableKeys);
+                    u.addClass('shake', 'menu');
 
-        console.log(event.keyCode, uniqueUnableKeys);
-        console.log(this.selectedKeyToModify);
-        if (selectedKeyToModify) {
-            if(!uniqueUnableKeys.has(event.keyCode)) {
-                const player = Kurve.getPlayer(selectedKeyToModify.playerId)
-                player.setKey(selectedKeyToModify.key, event.keyCode)
-                this.selectNextKeyToModify();
-                let modifiedDiv = document.getElementById(selectedKeyToModify.playerId + "-key-" + selectedKeyToModify.key)
-                modifiedDiv.innerHTML = "<div>" + player.getKeyChar(selectedKeyToModify.key) + "</div>";
-            } else {
-                Kurve.Menu.audioPlayer.play('menu-error', {reset: true});
-
-                u.addClass('shake', 'menu');
-
-                setTimeout(function() {
-                    u.removeClass('shake', 'menu');
-                }, 450); //see Sass shake animation in _mixins.scss
+                    setTimeout(function() {
+                        u.removeClass('shake', 'menu');
+                    }, 450); //see Sass shake animation in _mixins.scss
+                }
             }
         }
     },
