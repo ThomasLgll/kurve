@@ -24,13 +24,29 @@
 
 'use strict';
 
-Kurve.Player = function(id, keyLeft, keyRight, keySuperpower) {
-
+Kurve.Player = function(id) {
     var points = 0;
     var superpower = Kurve.Factory.getSuperpower(Kurve.Superpowerconfig.types.NO_SUPERPOWER);
     var superPowerElement = null;
     var isActive = false;
     var color = null;
+
+    var keys = {
+        "left": null,
+        "right": null,
+        "superpower": null,
+    }
+
+    const storedKeys = localStorage.getItem(id + "-keys")
+    if (storedKeys) {
+        keys = JSON.parse(storedKeys)
+        console.log(keys);
+        Object.keys(keys).forEach(key => {
+            if (keys[key] === "null" || keys[key] === "" || keys[key] === " ") {
+                keys[key] = null
+            }
+        })
+    }
     
     this.incrementPoints = function() {
         points++;
@@ -53,20 +69,60 @@ Kurve.Player = function(id, keyLeft, keyRight, keySuperpower) {
     this.getId = function() { return id; };
     this.getColor = function() { return color === null ? Kurve.Theming.getThemedValue('players', id) : color };
     this.getSuperpower = function() { return superpower; };
-    this.getKeyLeft = function() { return keyLeft; };
-    this.getKeyRight = function() { return keyRight; };
-    this.getKeySuperpower = function() { return keySuperpower; };
+    this.getKeyLeft = function() { return keys.left };
+    this.getKeyRight = function() { return keys.right };
+    this.getKeySuperpower = function() { return keys.superpower };
     this.isActive = function() { return isActive; };
 
+    this.getUnableKeys = function (exceptKey) {
+        let unableKeys = []
+        Object.entries(keys).forEach(function([key, value]) {
+            if (exceptKey !== key) {
+                unableKeys.push(value)
+            }
+        })
+        return unableKeys
+    }
+
+    this.setKey = function(key, value) {
+        keys[key] = value;
+        localStorage.setItem(id + "-keys", JSON.stringify(keys));
+    }
+
+    this.getKey = function(key) {
+        return keys[key]
+    }
+
+    this.areKeysSet = function() {
+        return Object.values(keys).every(value => value !== null)
+    }
+
+    this.getNextRequiredKey = function() {
+        const nullableKeyFound = Object.entries(keys).find(([key, value]) => value === null)
+        if (nullableKeyFound) {
+            return nullableKeyFound[0]
+        } else {
+            return null
+        }
+
+    }
+
+
 };
+
+function handleSelectedKeyToModify(event, playerId, key) {
+    event.stopPropagation();
+    console.log("CLICKED")
+    Kurve.Menu.setSelectedKeyToModify(playerId, key)
+}
 
 Kurve.Player.prototype.renderMenuItem = function() {
     return  '<div id="' + this.getId() + '" class="player inactive ' + this.getId() +'">' +
                 '<div class="title light"><h2>' + this.getId() + '</h2></div>' +
-                '<div class="key left light"><div>' + this.getKeyLeftChar() + '</div></div>' +
-                '<div class="key right light"><div>' + this.getKeyRightChar() + '</div></div>' +
+                '<div id="' + this.getId() + '-key-left" class="key left light key-inactive" onclick="handleSelectedKeyToModify(event, \'' + this.getId() + '\', `left`)"><div>' + this.getKeyLeftChar() + '</div></div>' +
+                '<div id="' + this.getId() + '-key-right" class="key right light key-inactive" onclick="handleSelectedKeyToModify(event, \'' + this.getId() + '\', `right`)"><div>' + this.getKeyRightChar() + '</div></div>' +
                 '<div class="superpower">' +
-                    '<div class="key light">' + this.getKeySuperpowerChar() + '</div>' +
+                    '<div id="' + this.getId() + '-key-superpower" class="key light key-inactive" onclick="handleSelectedKeyToModify(event, \'' + this.getId() + '\', `superpower`)">' + this.getKeySuperpowerChar() + '</div>' +
                     '<div class="superpowerType light">' +
                         '<div class="left" onclick="Kurve.Menu.onPreviousSuperPowerClicked(event, \'' + this.getId() + '\')"><i class="arrow arrow-left"></i></div>' +
                         '<div class="superpowers">' +
@@ -114,26 +170,40 @@ Kurve.Player.prototype.isKeySuperpower = function(keyCode) {
 };
 
 Kurve.Player.prototype.getKeyLeftChar = function() {
+    if ( this.isNullKey(this.getKeyLeft())) return "?"
     if ( this.isArrowKey(this.getKeyLeft()) ) return this.arrowKeyChar(this.getKeyLeft());
 
     return String.fromCharCode(this.getKeyLeft());
 };
 
 Kurve.Player.prototype.getKeyRightChar = function() {
+    if ( this.isNullKey(this.getKeyLeft())) return "?"
     if ( this.isArrowKey(this.getKeyRight()) ) return this.arrowKeyChar(this.getKeyRight());
 
     return String.fromCharCode(this.getKeyRight());
 };
 
 Kurve.Player.prototype.getKeySuperpowerChar = function() {
+    if ( this.isNullKey(this.getKeyLeft())) return "?"
     if ( this.isArrowKey(this.getKeySuperpower()) ) return this.arrowKeyChar(this.getKeySuperpower());
 
     return String.fromCharCode(this.getKeySuperpower());
 };
 
+Kurve.Player.prototype.getKeyChar = function(key) {
+    if ( this.isNullKey(this.getKey(key))) return "?"
+    if ( this.isArrowKey(this.getKey(key)) ) return this.arrowKeyChar(this.getKey(key));
+
+    return String.fromCharCode(this.getKey(key));
+}
+
 Kurve.Player.prototype.isArrowKey = function(keyCode) {
     return keyCode === 37 || keyCode === 39 || keyCode === 40;
 };
+
+Kurve.Player.prototype.isNullKey = function(keyCode) {
+    return keyCode === null
+}
 
 Kurve.Player.prototype.arrowKeyChar = function(keyCode) {
     switch (keyCode) {

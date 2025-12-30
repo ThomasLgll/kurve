@@ -70,6 +70,8 @@ Kurve.Config = {
         { id:'blue',     keyLeft:66,   keyRight:78,   keySuperpower:77  },
         { id:'purple',   keyLeft:76,   keyRight:79,   keySuperpower:80  },
         { id:'pink',     keyLeft:53,   keyRight:54,   keySuperpower:55  },
+        { id:'yellow',   keyLeft:53,   keyRight:54,   keySuperpower:55  },
+        { id:'cyan',     keyLeft:53,   keyRight:54,   keySuperpower:55  },
     ],
 
     Theming: {
@@ -80,7 +82,9 @@ Kurve.Config = {
                 green: '#3BCB69',
                 blue: '#3B90C3',
                 purple: '#7D11CD',
-                pink: '#DC72FF'
+                pink: '#DC72FF',
+                yellow: '#f7ff33',
+                cyan: '#5cffe5'
             },
             field: {
                 backgroundColor: '#EBE7DC',
@@ -99,7 +103,9 @@ Kurve.Config = {
                 green: '#7CFC00',
                 blue: '#1E90FF',
                 purple: '#9370DB',
-                pink: '#FF1493'
+                pink: '#FF1493',
+                yellow: '#f6ea00',
+                cyan: '#00ecc6'
             },
             field: {
                 backgroundColor: '#222222',

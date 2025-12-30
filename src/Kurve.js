@@ -46,7 +46,7 @@ var Kurve = {
         
     initPlayers: function() {
         Kurve.Config.Players.forEach(function(player) {
-            var player = new Kurve.Player(player.id, player.keyLeft, player.keyRight, player.keySuperpower);
+            var player = new Kurve.Player(player.id);
 
             Kurve.players.push(player);
             Kurve.playersById[player.getId()] = player;
@@ -63,6 +63,15 @@ var Kurve = {
 
     onUnload: function() {
         Kurve.Piwik.trackPageView();
+    },
+
+    getNextPlayer: function(playerId) {
+        const playerIndex = this.players.findIndex(player => player.getId() === playerId);
+        if (playerIndex < this.players.length - 1) {
+            return this.players[playerIndex + 1];
+        } else {
+            return null;
+        }
     }
 
 };

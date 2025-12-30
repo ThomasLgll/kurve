@@ -143,6 +143,14 @@ p {
     color: $default-theme-pink;
 }
 
+.yellow.active {
+    color: $default-theme-yellow;
+}
+
+.cyan.active {
+    color: $default-theme-cyan;
+}
+
 #content {
     width: 100%;
     height: 100%;
@@ -216,6 +224,10 @@ p {
             width: 60px;
             margin: 0 1px 1px 0;
         }
+    }
+
+    .key.key-active {
+        background-color: #2b2b2b;
     }
 
     .superpower .key {
@@ -399,6 +411,14 @@ p {
 
     &.pink {
         border: 2px solid $default-theme-pink;
+    }
+
+    &.yellow {
+        border: 2px solid $default-theme-yellow;
+    }
+
+    &.cyan {
+        border: 2px solid $default-theme-cyan;
     }
 }
 
@@ -607,6 +627,19 @@ body.dark-theme {
         border: 2px solid $dark-theme-pink;
     }
 
+    .yellow.active {
+        color: $dark-theme-yellow;
+    }
+    .superpowerCircle.yellow {
+        border: 2px solid $dark-theme-yellow;
+    }
+
+    .cyan.active {
+        color: $dark-theme-cyan;
+    }
+    .superpowerCircle.cyan {
+        border: 2px solid $dark-theme-cyan;
+    }
     .button {
         background: #222;
         color: #DDD;
