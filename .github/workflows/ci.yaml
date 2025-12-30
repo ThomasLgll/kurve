@@ -1,13 +1,15 @@
-name: CI Build Kurve
+name: Build & Release
 
 on:
   push:
     branches:
       - main
-  pull_request:
+
+permissions:
+  contents: write   # obligatoire pour créer une release
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,10 +28,20 @@ jobs:
       - name: Build with Gulp
         run: npx gulp build
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      - name: Prepare artifact
+        run: |
+          mkdir artifact
+          cp index.html artifact/
+          cp -r dist artifact/
+
+      - name: Create zip archive
+        run: |
+          cd artifact
+          zip -r ../kurve-build-${{ github.run_number }}.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: kurve-artifact
-          path: |
-            index.html
-            dist/
+          tag_name: v${{ github.run_number }}
+          name: Kurve Release v${{ github.run_number }}
+          files: kurve-build-${{ github.run_number }}.zip
